@@ -15,7 +15,7 @@ public class Item {
     private String description;
 
     @NotNull
-    private Boolean Available;
+    private Boolean available;
 
     private Long ownerId;
 

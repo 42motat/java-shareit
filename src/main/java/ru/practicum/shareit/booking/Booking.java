@@ -15,10 +15,3 @@ public class Booking {
     private User booker;
     private String status;
 }
-
-enum StatusName {
-    WAITING,
-    APPROVED,
-    REJECTED,
-    CANCELED
-}
