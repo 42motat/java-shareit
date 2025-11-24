@@ -1,3 +1,9 @@
+/*
+ * Александру Ф.
+ * Добрый день!
+ * Заранее благодарю за код-ревью.
+ * */
+
 package ru.practicum.shareit;
 
 import org.springframework.boot.SpringApplication;
