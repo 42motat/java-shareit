@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingItemDto;
@@ -77,6 +78,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public ItemDto create(long userId, ItemDto itemDto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Такой пользователь не найден"));
@@ -86,6 +88,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public ItemDto update(long id, long userId, UpdatedItemDto updatedItemDto) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Такой пользователь не найден"));
@@ -121,6 +124,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public CommentDto createComment(long itemId, long userId, String text) {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Такая вещь не найдена"));

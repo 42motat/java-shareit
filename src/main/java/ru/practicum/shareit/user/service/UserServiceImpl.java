@@ -1,5 +1,6 @@
 package ru.practicum.shareit.user.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.Conflict;
@@ -33,6 +34,7 @@ public class UserServiceImpl implements UserService {
         }
 
     @Override
+    @Transactional
     public UserDto create(UserDto userDto) {
         User user = UserMapper.mapToUser(userDto);
         validEmailCheck(user.getEmail(), user);
@@ -41,6 +43,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserDto update(Long id, UpdateUserDto updateUserDto) {
         User updatedUser = userRepository.findById(id)
                 .map(user -> UserMapper.updateUserFields(user, updateUserDto))
