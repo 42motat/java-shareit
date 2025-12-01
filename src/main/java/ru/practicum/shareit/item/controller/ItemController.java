@@ -5,6 +5,8 @@ import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.ItemBookingAndCommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.UpdatedItemDto;
 import ru.practicum.shareit.item.service.ItemService;
@@ -21,8 +23,8 @@ public class ItemController {
     private final ItemService itemService;
 
     @GetMapping("/{id}")
-    public ItemDto getById(@PathVariable long id) {
-        return itemService.getById(id);
+    public ItemBookingAndCommentDto getById(@PathVariable long id, @RequestHeader(value = CUSTOM_USER_ID_HEADER) @Positive long userId) {
+        return itemService.getById(id, userId);
     }
 
     @GetMapping
@@ -51,6 +53,12 @@ public class ItemController {
     public Collection<ItemDto> search(@RequestHeader(value = CUSTOM_USER_ID_HEADER) @Positive long id,
                                       @RequestParam String text) {
         return itemService.search(id, text);
+    }
 
+    @PostMapping("/{id}/comment")
+    public CommentDto createComment(@PathVariable Long id,
+                                    @RequestHeader(value = CUSTOM_USER_ID_HEADER) @Positive long userId,
+                                    @RequestBody CommentDto commentDto) {
+        return itemService.createComment(id, userId, commentDto.getText());
     }
 }
