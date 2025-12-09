@@ -12,13 +12,12 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(ItemController.class)
 public class ItemControllerTest {
-    private static final String CUSTOM_USER_ID_HEADER = "X-Sharer-User-Id";
-
     @Autowired
     private MockMvc mockMvc;
 
@@ -28,21 +27,43 @@ public class ItemControllerTest {
     @MockBean
     private ItemService itemService;
 
-    @Test
-    void testCreateItem() throws Exception {
-        long userId = 1L;
-        ItemDto itemDto = new ItemDto();
-        itemDto.setName("test");
-        itemDto.setDescription("test-desc");
-        itemDto.setAvailable(true);
-        itemDto.setOwnerId(1L);
+    private static final String CUSTOM_USER_ID_HEADER = "X-Sharer-User-Id";
+    private static final long USER_ID = 1L;
 
-        when(itemService.create(userId, itemDto)).thenReturn(itemDto);
+    @Test
+    void createItemTest() throws Exception {
+        ItemDto requestDto = new ItemDto();
+        requestDto.setName("test-item");
+        requestDto.setDescription("test-item-desc");
+        requestDto.setAvailable(true);
+        requestDto.setOwnerId(USER_ID);
+
+        when(itemService.create(USER_ID, requestDto)).thenReturn(requestDto);
 
         mockMvc.perform(post("/items")
-                        .header(CUSTOM_USER_ID_HEADER, userId)
+                        .header(CUSTOM_USER_ID_HEADER, USER_ID)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(itemDto)))
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value(requestDto.getName()));
+    }
+
+    @Test
+    void updateItemTest() throws Exception {
+        Long itemId = 123L;
+
+        ItemDto requestDto = new ItemDto();
+        requestDto.setName("test-item");
+        requestDto.setDescription("test-item-desc");
+        requestDto.setAvailable(true);
+        requestDto.setOwnerId(USER_ID);
+
+        when(itemService.create(USER_ID, requestDto)).thenReturn(requestDto);
+
+        mockMvc.perform(patch("/items/{itemId}", itemId)
+                        .header(CUSTOM_USER_ID_HEADER, USER_ID)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
                 .andExpect(status().isOk());
     }
 
