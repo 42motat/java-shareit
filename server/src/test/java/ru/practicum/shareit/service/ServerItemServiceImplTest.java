@@ -76,8 +76,6 @@ public class ServerItemServiceImplTest {
 
         userRepository.save(user);
 
-        System.out.println(user.getId());
-
         ItemDto itemToCreate = itemService.create(user.getId(), itemDto);
 
         UpdatedItemDto updatedItemDto = new UpdatedItemDto();
@@ -107,11 +105,9 @@ public class ServerItemServiceImplTest {
 
         ItemDto itemDtoToGet = itemService.create(user.getId(), itemDto);
 
-        System.out.println(user.getId());
-        System.out.println(itemDtoToGet.getId());
-        ItemBookingAndCommentDto itemDtoTest = itemService.getById(2L, 2L);
+        ItemBookingAndCommentDto itemDtoTest = itemService.getById(itemDtoToGet.getId(), user.getId());
 
-        assertEquals(2L, itemDtoTest.getOwnerId());
+        assertEquals(1L, itemDtoTest.getOwnerId());
     }
 
     @Test
@@ -123,7 +119,7 @@ public class ServerItemServiceImplTest {
 
         User user = new User();
         user.setName("test-user");
-        user.setEmail("test3@email.com");
+        user.setEmail("test4@email.com");
 
         userRepository.save(user);
 
