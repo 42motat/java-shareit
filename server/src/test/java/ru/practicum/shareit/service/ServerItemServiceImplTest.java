@@ -71,7 +71,7 @@ public class ServerItemServiceImplTest {
         ItemDto itemToCreate = itemService.create(user.getId(), itemDto);
 
         UpdatedItemDto updatedItemDto = new UpdatedItemDto();
-        updatedItemDto.setId(itemToCreate.getId()-2);
+        updatedItemDto.setId(itemToCreate.getId() - 2);
         updatedItemDto.setName("test-item-update");
         updatedItemDto.setDescription(itemToCreate.getDescription());
         updatedItemDto.setAvailable(false);
