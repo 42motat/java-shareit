@@ -78,9 +78,9 @@ public class ServerItemServiceImplTest {
 
         log.error(itemToCreate.getId().toString());
         log.error(updatedItemDto.getId().toString());
-        ItemDto itemToUpdate = itemService.update(user.getId(), updatedItemDto.getId(), updatedItemDto);
+        ItemDto itemToUpdate = itemService.update(user.getId() - 2, updatedItemDto.getId(), updatedItemDto);
 
-        assertNotNull(itemToCreate.getId());
+        assertNotNull(updatedItemDto.getId());
         assertEquals("test-item-update", itemToUpdate.getName());
         assertEquals("test-item-desc", itemToUpdate.getDescription());
         assertFalse(itemToUpdate.getAvailable());
