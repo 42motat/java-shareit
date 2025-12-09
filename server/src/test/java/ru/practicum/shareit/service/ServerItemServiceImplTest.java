@@ -71,10 +71,11 @@ public class ServerItemServiceImplTest {
         ItemDto itemToCreate = itemService.create(user.getId(), itemDto);
 
         UpdatedItemDto updatedItemDto = new UpdatedItemDto();
+        updatedItemDto.setId(itemToCreate.getId());
         updatedItemDto.setName("test-item-update");
         updatedItemDto.setAvailable(false);
 
-        ItemDto itemToUpdate = itemService.update(user.getId(), itemToCreate.getId(), updatedItemDto);
+        ItemDto itemToUpdate = itemService.update(user.getId(), updatedItemDto.getId(), updatedItemDto);
 
         assertNotNull(itemToCreate.getId());
         assertEquals("test-item-update", itemToUpdate.getName());
