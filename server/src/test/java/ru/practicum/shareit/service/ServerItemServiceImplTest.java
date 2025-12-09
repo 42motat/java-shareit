@@ -1,10 +1,7 @@
 package ru.practicum.shareit.service;
 
-import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -15,16 +12,19 @@ import ru.practicum.shareit.item.repostitory.ItemRepository;
 import ru.practicum.shareit.item.service.ItemServiceImpl;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.shareit.user.service.UserService;
 
 import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
-@SpringBootTest
+@Slf4j
 @ActiveProfiles("test")
-@TestMethodOrder(MethodOrderer.Alphanumeric.class)
+@SpringBootTest
 public class ServerItemServiceImplTest {
+    @Autowired
+    private UserService userService;
+
     @Autowired
     private ItemServiceImpl itemService;
 
@@ -34,14 +34,7 @@ public class ServerItemServiceImplTest {
     @Autowired
     private ItemRepository itemRepository;
 
-    @BeforeEach
-    void setUp() {
-        userRepository.deleteAll();
-        itemRepository.deleteAll();
-    }
-
     @Test
-    @Transactional
     void createItemTest() {
         ItemDto itemDto = new ItemDto();
         itemDto.setName("test-item");
@@ -63,7 +56,6 @@ public class ServerItemServiceImplTest {
     }
 
     @Test
-    @Transactional
     void updateItemTest() {
         ItemDto itemDto = new ItemDto();
         itemDto.setName("test-item");
@@ -72,7 +64,7 @@ public class ServerItemServiceImplTest {
 
         User user = new User();
         user.setName("test-user");
-        user.setEmail("test2@email.com");
+        user.setEmail("test1@email.com");
 
         userRepository.save(user);
 
@@ -99,7 +91,7 @@ public class ServerItemServiceImplTest {
 
         User user = new User();
         user.setName("test-user");
-        user.setEmail("test3@email.com");
+        user.setEmail("test1@email.com");
 
         userRepository.save(user);
 
@@ -107,7 +99,7 @@ public class ServerItemServiceImplTest {
 
         ItemBookingAndCommentDto itemDtoTest = itemService.getById(itemDtoToGet.getId(), user.getId());
 
-        assertEquals(1L, itemDtoTest.getOwnerId());
+        assertEquals(user.getId(), itemDtoTest.getOwnerId());
     }
 
     @Test
@@ -119,7 +111,7 @@ public class ServerItemServiceImplTest {
 
         User user = new User();
         user.setName("test-user");
-        user.setEmail("test4@email.com");
+        user.setEmail("test1@email.com");
 
         userRepository.save(user);
 
