@@ -1,5 +1,6 @@
 package ru.practicum.shareit.service;
 
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,7 @@ public class ServerItemServiceImplTest {
     }
 
     @Test
+    @Transactional
     void createItemTest() {
         ItemDto itemDto = new ItemDto();
         itemDto.setName("test-item");
@@ -58,6 +60,7 @@ public class ServerItemServiceImplTest {
     }
 
     @Test
+    @Transactional
     void updateItemTest() {
         ItemDto itemDto = new ItemDto();
         itemDto.setName("test-item");
