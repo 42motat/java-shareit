@@ -32,8 +32,6 @@ public class GatewayBookingTest {
     @MockBean
     private BookingClient bookingClient;
 
-    private final String HEADER = "X-Sharer-User-Id";
-
     @Test
     void getBookingsTest() throws Exception {
         long userId = 1L;

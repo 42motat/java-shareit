@@ -9,9 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.practicum.shareit.item.ItemClient;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.UpdatedItemDto;
 import ru.practicum.shareit.user.UserClient;
 import ru.practicum.shareit.user.UserController;
 import ru.practicum.shareit.user.dto.UpdateUserDto;
@@ -32,8 +29,6 @@ public class GatewayUserTest {
 
     @MockBean
     private UserClient userClient;
-
-    private final String HEADER = "X-Sharer-User-Id";
 
     @Test
     void getUserByIdTest() throws Exception {

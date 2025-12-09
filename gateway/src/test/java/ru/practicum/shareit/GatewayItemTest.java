@@ -29,8 +29,6 @@ public class GatewayItemTest {
     @MockBean
     private ItemClient itemClient;
 
-    private final String HEADER = "X-Sharer-User-Id";
-
     @Test
     void getItemByIdTest() throws Exception {
         long userId = 1L;
