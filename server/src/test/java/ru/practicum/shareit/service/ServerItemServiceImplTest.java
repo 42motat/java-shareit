@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @ActiveProfiles("test")
-public class ItemServiceImplTest {
+public class ServerItemServiceImplTest {
     @Autowired
     private ItemServiceImpl itemService;
 
@@ -32,8 +32,8 @@ public class ItemServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        itemRepository.deleteAll();
         userRepository.deleteAll();
+        itemRepository.deleteAll();
     }
 
     @Test
