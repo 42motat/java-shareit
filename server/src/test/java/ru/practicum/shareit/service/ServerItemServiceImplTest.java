@@ -2,7 +2,9 @@ package ru.practicum.shareit.service;
 
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -21,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @ActiveProfiles("test")
+@TestMethodOrder(MethodOrderer.Alphanumeric.class)
 public class ServerItemServiceImplTest {
     @Autowired
     private ItemServiceImpl itemService;
@@ -73,6 +76,8 @@ public class ServerItemServiceImplTest {
 
         userRepository.save(user);
 
+        System.out.println(user.getId());
+
         ItemDto itemToCreate = itemService.create(user.getId(), itemDto);
 
         UpdatedItemDto updatedItemDto = new UpdatedItemDto();
@@ -100,11 +105,13 @@ public class ServerItemServiceImplTest {
 
         userRepository.save(user);
 
-        itemService.create(user.getId(), itemDto);
+        ItemDto itemDtoToGet = itemService.create(user.getId(), itemDto);
 
-        ItemBookingAndCommentDto itemDtoTest = itemService.getById(1L, 1L);
+        System.out.println(user.getId());
+        System.out.println(itemDtoToGet.getId());
+        ItemBookingAndCommentDto itemDtoTest = itemService.getById(2L, 2L);
 
-        assertEquals(1L, itemDtoTest.getOwnerId());
+        assertEquals(2L, itemDtoTest.getOwnerId());
     }
 
     @Test
