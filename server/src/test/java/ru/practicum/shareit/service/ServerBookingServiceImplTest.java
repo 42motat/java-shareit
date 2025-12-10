@@ -55,7 +55,7 @@ public class ServerBookingServiceImplTest {
 
         UserDto userDto = new UserDto();
         userDto.setName("test-user");
-        userDto.setEmail("test1@email.com");
+        userDto.setEmail("test22@email.com");
 
         UserDto userToCreate = userService.create(userDto);
 
@@ -92,7 +92,7 @@ public class ServerBookingServiceImplTest {
 
         UserDto userDto = new UserDto();
         userDto.setName("test-user");
-        userDto.setEmail("test2@email.com");
+        userDto.setEmail("test21@email.com");
 
         UserDto userToCreate = userService.create(userDto);
 

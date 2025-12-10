@@ -57,7 +57,7 @@ public class ServerItemServiceImplTest {
 
         User user = new User();
         user.setName("test-user");
-        user.setEmail("test1@email.com");
+        user.setEmail("test35@email.com");
 
         userRepository.save(user);
 
@@ -78,7 +78,7 @@ public class ServerItemServiceImplTest {
 
         User user = new User();
         user.setName("test-user");
-        user.setEmail("test1@email.com");
+        user.setEmail("test33@email.com");
 
         userRepository.save(user);
 
@@ -107,7 +107,7 @@ public class ServerItemServiceImplTest {
 
         User user = new User();
         user.setName("test-user");
-        user.setEmail("test1@email.com");
+        user.setEmail("test34@email.com");
 
         userRepository.save(user);
 
@@ -127,7 +127,7 @@ public class ServerItemServiceImplTest {
 
         User user = new User();
         user.setName("test-user");
-        user.setEmail("test1@email.com");
+        user.setEmail("test31@email.com");
 
         userRepository.save(user);
 
@@ -151,7 +151,7 @@ public class ServerItemServiceImplTest {
 
         User user = new User();
         user.setName("test-user");
-        user.setEmail("test1@email.com");
+        user.setEmail("test32@email.com");
 
         userRepository.save(user);
 

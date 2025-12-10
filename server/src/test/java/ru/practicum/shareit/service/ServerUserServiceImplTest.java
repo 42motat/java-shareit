@@ -32,7 +32,7 @@ public class ServerUserServiceImplTest {
     void createUserTest() {
         UserDto userDto = new UserDto();
         userDto.setName("test-user");
-        userDto.setEmail("test1@email.com");
+        userDto.setEmail("test11@email.com");
 
         UserDto userToCreate = userService.create(userDto);
 
@@ -45,7 +45,7 @@ public class ServerUserServiceImplTest {
     void updateUserTest() {
         UserDto userDto = new UserDto();
         userDto.setName("test-user");
-        userDto.setEmail("test2@email.com");
+        userDto.setEmail("test12@email.com");
 
         UserDto userToCreate = userService.create(userDto);
 
