@@ -35,8 +35,8 @@ public class ServerBookingControllerTest {
 
     @Test
     void createBookingService() throws Exception {
-        LocalDateTime start = LocalDateTime.of(2026, 12, 10, 1, 1);
-        LocalDateTime end = LocalDateTime.of(2026, 12, 10, 13, 1);
+        LocalDateTime start = LocalDateTime.of(2026, 12, 10, 1, 1,1);
+        LocalDateTime end = LocalDateTime.of(2026, 12, 10, 13, 1,1);
 
         NewBookingDto newBookingDto = new NewBookingDto();
         newBookingDto.setStart(start);
