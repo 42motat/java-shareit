@@ -22,6 +22,7 @@ public class Comment {
 
     @ManyToOne
     @JoinColumn(name = "item_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Item item;
 
     @ManyToOne
