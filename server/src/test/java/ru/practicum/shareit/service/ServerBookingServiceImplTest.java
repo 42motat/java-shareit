@@ -12,6 +12,7 @@ import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.booking.service.BookingServiceImpl;
 import ru.practicum.shareit.exception.BadRequest;
+import ru.practicum.shareit.exception.Forbidden;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repostitory.ItemRepository;
@@ -148,6 +149,38 @@ public class ServerBookingServiceImplTest {
         bookingToCreate = bookingService.updateBookingStatus(owner.getId(), bookingToCreate.getId(), true);
 
         assertEquals("APPROVED", bookingToCreate.getStatus().toString());
+    }
+
+    @Test
+    void getBookingByIdTest() {
+        NewBookingDto bookingDto = new NewBookingDto();
+        bookingDto.setItemId(item.getId());
+        bookingDto.setStart(LocalDateTime.of(2026, 12, 10, 11, 0, 0));
+        bookingDto.setEnd(LocalDateTime.of(2026, 12, 10, 12, 0, 0));
+        bookingDto.setBookerId(booker.getId());
+
+        BookingDto bookingToCreate = bookingService.create(booker.getId(), bookingDto);
+
+        assertDoesNotThrow(() -> bookingService.getById(booker.getId(), bookingToCreate.getId()));
+    }
+
+    @Test
+    void getBookingBySomeOtherUserTest() {
+        NewBookingDto bookingDto = new NewBookingDto();
+        bookingDto.setItemId(item.getId());
+        bookingDto.setStart(LocalDateTime.of(2026, 12, 10, 11, 0, 0));
+        bookingDto.setEnd(LocalDateTime.of(2026, 12, 10, 12, 0, 0));
+        bookingDto.setBookerId(booker.getId());
+
+        BookingDto bookingToCreate = bookingService.create(booker.getId(), bookingDto);
+
+        User someOtherUser = new User();
+        someOtherUser.setName("test-booker");
+        someOtherUser.setEmail("test0240@email.com");
+
+        userRepository.save(someOtherUser);
+
+        assertThrows(Forbidden.class, () -> bookingService.getById(someOtherUser.getId(), bookingToCreate.getId()));
     }
 
     @Test

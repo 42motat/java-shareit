@@ -48,12 +48,15 @@ public class ServerRequestServiceImplTest {
 
     @BeforeEach
     void setUp() {
+        itemRequestRepository.deleteAll();
+        itemRepository.deleteAll();
+        userRepository.deleteAll();
+
         requestor = new User();
         requestor.setName("test-user");
         requestor.setEmail("test17@email.com");
 
         userRepository.save(requestor);
-
     }
 
     @Test
@@ -77,7 +80,7 @@ public class ServerRequestServiceImplTest {
         requestDto.setRequestor(requestor);
         requestDto.setCreated(LocalDateTime.now());
 
-        requestor.setId(42L);
+        requestor.setId(420000L);
 
         assertThrows(NotFoundException.class, () -> itemRequestService.create(requestor.getId(), requestDto));
     }
@@ -104,5 +107,77 @@ public class ServerRequestServiceImplTest {
         ItemRequestDto requestToCreate = itemRequestService.create(requestor.getId(), requestDto);
 
         assertEquals(requestToCreate.getId(), itemRequestService.getById(requestor.getId(), requestToCreate.getId()).getId());
+    }
+
+//    @Test
+//    void getItemRequestsOfUserTest() {
+//        ItemRequestDto requestDto1 = new ItemRequestDto();
+//        requestDto1.setDescription("test-request");
+//        requestDto1.setRequestor(requestor);
+//        requestDto1.setCreated(LocalDateTime.now().plusDays(1));
+//
+//        ItemRequestDto requestDto2 = new ItemRequestDto();
+//        requestDto2.setDescription("test-request");
+//        requestDto2.setRequestor(requestor);
+//        requestDto2.setCreated(LocalDateTime.now().plusDays(2));
+//
+//        itemRequestService.create(requestor.getId(), requestDto1);
+//        itemRequestService.create(requestor.getId(), requestDto2);
+//
+//        assertEquals(2, itemRequestService.getAllItemRequestsOfUser(requestor.getId()).size());
+//    }
+
+    @Test
+    void getItemRequestsOfUnknownUserTest() {
+        ItemRequestDto requestDto1 = new ItemRequestDto();
+        requestDto1.setDescription("test-request");
+        requestDto1.setCreated(LocalDateTime.now().plusDays(1));
+
+        ItemRequestDto requestDto2 = new ItemRequestDto();
+        requestDto2.setDescription("test-request");
+        requestDto2.setCreated(LocalDateTime.now().plusDays(2));
+
+        itemRequestService.create(requestor.getId(), requestDto1);
+        itemRequestService.create(requestor.getId(), requestDto2);
+
+        assertThrows(NotFoundException.class, () -> itemRequestService.getAllItemRequestsOfUser(requestor.getId() + 4200));
+    }
+
+    @Test
+    void getItemRequestsOfUserTest() {
+        ItemRequestDto requestDto1 = new ItemRequestDto();
+        requestDto1.setDescription("test-request");
+        requestDto1.setRequestor(requestor);
+        requestDto1.setCreated(LocalDateTime.now().plusDays(1));
+
+        ItemRequestDto requestDto2 = new ItemRequestDto();
+        requestDto2.setDescription("test-request");
+        requestDto2.setRequestor(requestor);
+        requestDto2.setCreated(LocalDateTime.now().plusDays(2));
+
+        itemRequestService.create(requestor.getId(), requestDto1);
+        itemRequestService.create(requestor.getId(), requestDto2);
+
+        User anotherRequestor = new User();
+        requestor.setName("test-another-user");
+        requestor.setEmail("test17000@email.com");
+
+        userRepository.save(anotherRequestor);
+
+        ItemRequestDto requestDto3 = new ItemRequestDto();
+        requestDto3.setDescription("test-request");
+        requestDto3.setRequestor(anotherRequestor);
+        requestDto3.setCreated(LocalDateTime.now().plusDays(1));
+
+        ItemRequestDto requestDto4 = new ItemRequestDto();
+        requestDto4.setDescription("test-request");
+        requestDto4.setRequestor(anotherRequestor);
+        requestDto4.setCreated(LocalDateTime.now().plusDays(2));
+
+        itemRequestService.create(anotherRequestor.getId(), requestDto3);
+        itemRequestService.create(anotherRequestor.getId(), requestDto4);
+
+
+        assertEquals(2, itemRequestService.getAllItemRequestsOfUser(requestor.getId()).size());
     }
 }

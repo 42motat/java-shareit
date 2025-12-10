@@ -53,6 +53,10 @@ public class ServerItemServiceImplTest {
 
     @BeforeEach
     void setUp() {
+        bookingRepository.deleteAll();
+        itemRepository.deleteAll();
+        userRepository.deleteAll();
+
         user = new User();
         user.setName("test-user");
         user.setEmail("test35@email.com");
@@ -88,7 +92,7 @@ public class ServerItemServiceImplTest {
     }
 
     @Test
-    void updateItemTest() {
+    void updateItemNameTest() {
         ItemDto itemDto = new ItemDto();
         itemDto.setName("test-item");
         itemDto.setDescription("test-item-desc");
@@ -100,14 +104,50 @@ public class ServerItemServiceImplTest {
         UpdatedItemDto updatedItemDto = new UpdatedItemDto();
         updatedItemDto.setId(itemToCreate.getId());
         updatedItemDto.setName("test-item-update");
-        updatedItemDto.setDescription(itemToCreate.getDescription());
-        updatedItemDto.setAvailable(false);
 
         ItemDto itemToUpdate = itemService.update(updatedItemDto.getId(), user.getId(), updatedItemDto);
 
         assertNotNull(updatedItemDto.getId());
         assertEquals("test-item-update", itemToUpdate.getName());
-        assertEquals("test-item-desc", itemToUpdate.getDescription());
+    }
+
+    @Test
+    void updateItemDescriptionTest() {
+        ItemDto itemDto = new ItemDto();
+        itemDto.setName("test-item");
+        itemDto.setDescription("test-item-desc");
+        itemDto.setAvailable(true);
+        itemDto.setOwnerId(user.getId());
+
+        ItemDto itemToCreate = itemService.create(user.getId(), itemDto);
+
+        UpdatedItemDto updatedItemDto = new UpdatedItemDto();
+        updatedItemDto.setId(itemToCreate.getId());
+        updatedItemDto.setDescription("test-item-update-desc");
+
+        ItemDto itemToUpdate = itemService.update(updatedItemDto.getId(), user.getId(), updatedItemDto);
+
+        assertNotNull(updatedItemDto.getId());
+        assertEquals("test-item-update-desc", itemToUpdate.getDescription());
+    }
+
+    @Test
+    void updateItemAvailableTest() {
+        ItemDto itemDto = new ItemDto();
+        itemDto.setName("test-item");
+        itemDto.setDescription("test-item-desc");
+        itemDto.setAvailable(true);
+        itemDto.setOwnerId(user.getId());
+
+        ItemDto itemToCreate = itemService.create(user.getId(), itemDto);
+
+        UpdatedItemDto updatedItemDto = new UpdatedItemDto();
+        updatedItemDto.setId(itemToCreate.getId());
+        updatedItemDto.setAvailable(false);
+
+        ItemDto itemToUpdate = itemService.update(updatedItemDto.getId(), user.getId(), updatedItemDto);
+
+        assertNotNull(updatedItemDto.getId());
         assertFalse(itemToUpdate.getAvailable());
     }
 

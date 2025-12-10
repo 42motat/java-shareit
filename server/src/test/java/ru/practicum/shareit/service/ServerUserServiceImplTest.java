@@ -10,7 +10,7 @@ import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UpdateUserDto;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.repository.UserRepository;
-import ru.practicum.shareit.user.service.UserServiceImpl;
+import ru.practicum.shareit.user.service.UserService;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ServerUserServiceImplTest {
 
     @Autowired
-    private UserServiceImpl userService;
+    private UserService userService;
 
     @Autowired
     private UserRepository userRepository;
@@ -58,7 +58,7 @@ public class ServerUserServiceImplTest {
     }
 
     @Test
-    void updateUserTest() {
+    void updateUserEmailTest() {
         UserDto userDto = new UserDto();
         userDto.setName("test-user");
         userDto.setEmail("test12@email.com");
@@ -71,8 +71,24 @@ public class ServerUserServiceImplTest {
         UserDto userToUpdate = userService.update(userToCreate.getId(), updateUserDto);
 
         assertNotNull(userToCreate.getId());
-        assertEquals("test-user", userToUpdate.getName());
         assertEquals("test42@email.com", userToUpdate.getEmail());
+    }
+
+    @Test
+    void updateUserNameTest() {
+        UserDto userDto = new UserDto();
+        userDto.setName("test-user");
+        userDto.setEmail("test12@email.com");
+
+        UserDto userToCreate = userService.create(userDto);
+
+        UpdateUserDto updateUserDto = new UpdateUserDto();
+        updateUserDto.setName("test-user-updated");
+
+        UserDto userToUpdate = userService.update(userToCreate.getId(), updateUserDto);
+
+        assertNotNull(userToCreate.getId());
+        assertEquals("test-user-updated", userToUpdate.getName());
     }
 
     @Test
