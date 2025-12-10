@@ -131,14 +131,16 @@ public class BookingServiceImpl implements BookingService {
             throw new Forbidden("Только владелец может подтвердить бронирование");
         }
 
-        if (booking.getStatus() != BookingStatus.WAITING) {
+        if (!booking.getStatus().toString().equals("WAITING")) {
             throw new BadRequest("Статус отличается от 'Ожидает подтверждения'");
-        }
-
-        if (approved) {
-            booking.setStatus(BookingStatus.APPROVED);
         } else {
-            booking.setStatus(BookingStatus.REJECTED);
+            if (approved) {
+                booking.setStatus(BookingStatus.APPROVED);
+                bookingRepository.save(booking);
+            } else {
+                booking.setStatus(BookingStatus.REJECTED);
+                bookingRepository.save(booking);
+            }
         }
 
         return BookingMapper.mapToBookingDto(bookingRepository.save(booking));

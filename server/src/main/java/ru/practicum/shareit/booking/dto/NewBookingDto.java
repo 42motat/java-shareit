@@ -12,6 +12,8 @@ import java.time.LocalDateTime;
 
 @Data
 public class NewBookingDto {
+    private Long id;
+
     @NotNull
     private Long itemId;
 

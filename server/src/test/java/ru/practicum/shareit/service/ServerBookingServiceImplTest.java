@@ -9,7 +9,6 @@ import org.springframework.test.context.ActiveProfiles;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.NewBookingDto;
 import ru.practicum.shareit.booking.model.BookingState;
-import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.booking.service.BookingServiceImpl;
 import ru.practicum.shareit.exception.BadRequest;
@@ -143,18 +142,12 @@ public class ServerBookingServiceImplTest {
         bookingDto.setStart(LocalDateTime.of(2026, 12, 10, 11, 0, 0));
         bookingDto.setEnd(LocalDateTime.of(2026, 12, 10, 12, 0,0));
         bookingDto.setBookerId(booker.getId());
-        bookingDto.setStatus(BookingStatus.WAITING);
 
         BookingDto bookingToCreate = bookingService.create(booker.getId(), bookingDto);
 
-        NewBookingDto updatedBookingDto = new NewBookingDto();
-        updatedBookingDto.setStatus(BookingStatus.APPROVED);
+        bookingToCreate = bookingService.updateBookingStatus(owner.getId(), bookingToCreate.getId(), true);
 
-        BookingDto updatedBookingDtoToCreate = bookingService.updateBookingStatus(owner.getId(),
-                                                                                  bookingToCreate.getId(),
-                                                                         true);
-
-        assertEquals(BookingStatus.APPROVED, updatedBookingDtoToCreate.getStatus());
+        assertEquals("APPROVED", bookingToCreate.getStatus().toString());
     }
 
     @Test
