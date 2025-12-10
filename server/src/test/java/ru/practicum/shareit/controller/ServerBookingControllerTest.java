@@ -11,10 +11,6 @@ import ru.practicum.shareit.booking.controller.BookingController;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.NewBookingDto;
 import ru.practicum.shareit.booking.service.BookingService;
-import ru.practicum.shareit.item.repostitory.ItemRepository;
-import ru.practicum.shareit.item.service.ItemService;
-import ru.practicum.shareit.user.repository.UserRepository;
-import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
 
@@ -33,7 +29,7 @@ public class ServerBookingControllerTest {
 
     @MockBean
     private BookingService bookingService;
-    
+
     private static final String CUSTOM_USER_ID_HEADER = "X-Sharer-User-Id";
     private static final long USER_ID = 1L;
 
