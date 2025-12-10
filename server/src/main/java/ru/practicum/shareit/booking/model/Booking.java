@@ -3,6 +3,8 @@ package ru.practicum.shareit.booking.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
@@ -29,6 +31,7 @@ public class Booking {
 
     @ManyToOne
     @JoinColumn(name = "booker_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User booker;
 
     @Enumerated(EnumType.STRING)

@@ -1,6 +1,7 @@
 package ru.practicum.shareit.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -16,6 +17,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@Slf4j
 @WebMvcTest(ItemController.class)
 public class ServerItemControllerTest {
     @Autowired
@@ -39,6 +41,9 @@ public class ServerItemControllerTest {
         requestDto.setOwnerId(USER_ID);
 
         when(itemService.create(USER_ID, requestDto)).thenReturn(requestDto);
+
+        String json = objectMapper.writeValueAsString(requestDto);
+        log.error(json);
 
         mockMvc.perform(post("/items")
                         .header(CUSTOM_USER_ID_HEADER, USER_ID)
