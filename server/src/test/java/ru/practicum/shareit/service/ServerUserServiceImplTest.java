@@ -38,7 +38,7 @@ public class ServerUserServiceImplTest {
 
         assertNotNull(userToCreate.getId());
         assertEquals("test-user", userToCreate.getName());
-        assertEquals("test1@email.com", userToCreate.getEmail());
+        assertEquals("test11@email.com", userToCreate.getEmail());
     }
 
     @Test
