@@ -71,14 +71,12 @@ public class ServerItemServiceImplTest {
         ItemDto itemToCreate = itemService.create(user.getId(), itemDto);
 
         UpdatedItemDto updatedItemDto = new UpdatedItemDto();
-        updatedItemDto.setId(itemToCreate.getId() - 2);
+        updatedItemDto.setId(itemToCreate.getId());
         updatedItemDto.setName("test-item-update");
         updatedItemDto.setDescription(itemToCreate.getDescription());
         updatedItemDto.setAvailable(false);
 
-        log.error(itemToCreate.getId().toString());
-        log.error(updatedItemDto.getId().toString());
-        ItemDto itemToUpdate = itemService.update(user.getId() - 2, updatedItemDto.getId(), updatedItemDto);
+        ItemDto itemToUpdate = itemService.update(updatedItemDto.getId(), user.getId(), updatedItemDto);
 
         assertNotNull(updatedItemDto.getId());
         assertEquals("test-item-update", itemToUpdate.getName());
