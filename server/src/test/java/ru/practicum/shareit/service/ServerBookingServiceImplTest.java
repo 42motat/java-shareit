@@ -1,6 +1,7 @@
 package ru.practicum.shareit.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,12 +11,11 @@ import ru.practicum.shareit.booking.dto.NewBookingDto;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.booking.service.BookingServiceImpl;
+import ru.practicum.shareit.exception.BadRequest;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repostitory.ItemRepository;
 import ru.practicum.shareit.item.service.ItemServiceImpl;
-import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.service.UserServiceImpl;
@@ -46,33 +46,44 @@ public class ServerBookingServiceImplTest {
     @Autowired
     private BookingRepository bookingRepository;
 
+    private User booker;
+    private User owner;
+    private Item item;
+
+    @BeforeEach
+    void setUp() {
+        itemRepository.deleteAll();
+        userRepository.deleteAll();
+        bookingRepository.deleteAll();
+
+        owner = new User();
+        owner.setName("test-owner");
+        owner.setEmail("test220@email.com");
+
+        userRepository.save(owner);
+
+        item = new Item();
+        item.setName("test-item");
+        item.setDescription("test-item-desc");
+        item.setAvailable(Boolean.TRUE);
+        item.setOwnerId(owner.getId());
+
+        itemRepository.save(item);
+
+        booker = new User();
+        booker.setName("test-booker");
+        booker.setEmail("test240@email.com");
+
+        userRepository.save(booker);
+    }
+
     @Test
     void createBookingTest() {
-        ItemDto itemDto = new ItemDto();
-        itemDto.setName("test-item");
-        itemDto.setDescription("test-item-desc");
-        itemDto.setAvailable(true);
-
-        UserDto userDto = new UserDto();
-        userDto.setName("test-user");
-        userDto.setEmail("test22@email.com");
-
-        UserDto userToCreate = userService.create(userDto);
-
-        ItemDto itemToCreate = itemService.create(userToCreate.getId(), itemDto);
-
-        Item item = itemRepository.findById(itemToCreate.getId())
-                .orElseThrow(() -> new NotFoundException("Вещь не найдена"));
-
-        User booker = userRepository.findById(userToCreate.getId())
-                .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
-
         NewBookingDto bookingDto = new NewBookingDto();
         bookingDto.setItemId(item.getId());
         bookingDto.setStart(LocalDateTime.of(2026, 12, 10, 11, 0, 0));
         bookingDto.setEnd(LocalDateTime.of(2026, 12, 10, 12, 0, 0));
         bookingDto.setBookerId(booker.getId());
-        bookingDto.setStatus(BookingStatus.WAITING);
 
         BookingDto bookingToCreate = bookingService.create(booker.getId(), bookingDto);
 
@@ -84,26 +95,48 @@ public class ServerBookingServiceImplTest {
     }
 
     @Test
+    void createBookingBookerNotFoundTest() {
+        NewBookingDto bookingDto = new NewBookingDto();
+        bookingDto.setItemId(item.getId());
+        bookingDto.setStart(LocalDateTime.of(1986, 4, 26, 1, 23, 0));
+        bookingDto.setEnd(LocalDateTime.of(2026, 12, 10, 12, 0, 0));
+        bookingDto.setBookerId(42L);
+
+        assertThrows(NotFoundException.class, () -> bookingService.create(bookingDto.getBookerId(), bookingDto));
+    }
+
+    @Test
+    void createBookingItemNotFoundTest() {
+        NewBookingDto bookingDto = new NewBookingDto();
+        bookingDto.setItemId(42L);
+        bookingDto.setStart(LocalDateTime.of(1986, 4, 26, 1, 23, 0));
+        bookingDto.setEnd(LocalDateTime.of(2026, 12, 10, 12, 0, 0));
+        bookingDto.setBookerId(booker.getId());
+
+        assertThrows(NotFoundException.class, () -> bookingService.create(bookingDto.getBookerId(), bookingDto));
+    }
+
+    @Test
+    void createBookingItemNotAvailableTest() {
+        Item anotherItem = new Item();
+        anotherItem.setName("test-item-unavailable");
+        anotherItem.setDescription("test-item-desc");
+        anotherItem.setAvailable(Boolean.FALSE);
+        anotherItem.setOwnerId(owner.getId());
+
+        itemRepository.save(anotherItem);
+
+        NewBookingDto bookingDto = new NewBookingDto();
+        bookingDto.setItemId(anotherItem.getId());
+        bookingDto.setStart(LocalDateTime.of(1986, 4, 26, 1, 23, 0));
+        bookingDto.setEnd(LocalDateTime.of(2026, 12, 10, 12, 0, 0));
+        bookingDto.setBookerId(booker.getId());
+
+        assertThrows(BadRequest.class, () -> bookingService.create(bookingDto.getBookerId(), bookingDto));
+    }
+
+    @Test
     void updateBookingTest() {
-        ItemDto itemDto = new ItemDto();
-        itemDto.setName("test-item");
-        itemDto.setDescription("test-item-desc");
-        itemDto.setAvailable(true);
-
-        UserDto userDto = new UserDto();
-        userDto.setName("test-user");
-        userDto.setEmail("test21@email.com");
-
-        UserDto userToCreate = userService.create(userDto);
-
-        ItemDto itemToCreate = itemService.create(userToCreate.getId(), itemDto);
-
-        Item item = itemRepository.findById(itemToCreate.getId())
-                .orElseThrow(() -> new NotFoundException("Вещь не найдена"));
-
-        User booker = userRepository.findById(userToCreate.getId())
-                .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
-
         NewBookingDto bookingDto = new NewBookingDto();
         bookingDto.setItemId(item.getId());
         bookingDto.setStart(LocalDateTime.of(2026, 12, 10, 11, 0, 0));
@@ -116,7 +149,7 @@ public class ServerBookingServiceImplTest {
         NewBookingDto updatedBookingDto = new NewBookingDto();
         updatedBookingDto.setStatus(BookingStatus.APPROVED);
 
-        BookingDto updatedBookingDtoToCreate = bookingService.updateBookingStatus(booker.getId(),
+        BookingDto updatedBookingDtoToCreate = bookingService.updateBookingStatus(owner.getId(),
                                                                                   bookingToCreate.getId(),
                                                                          true);
 

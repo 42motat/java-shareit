@@ -9,6 +9,7 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.booking.service.BookingServiceImpl;
+import ru.practicum.shareit.exception.BadRequest;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemBookingAndCommentDto;
@@ -48,18 +49,24 @@ public class ServerItemServiceImplTest {
     @Autowired
     private BookingRepository bookingRepository;
 
+    private User user;
+
+    @BeforeEach
+    void setUp() {
+        user = new User();
+        user.setName("test-user");
+        user.setEmail("test35@email.com");
+
+        userRepository.save(user);
+    }
+
     @Test
     void createItemTest() {
         ItemDto itemDto = new ItemDto();
         itemDto.setName("test-item");
         itemDto.setDescription("test-item-desc");
         itemDto.setAvailable(true);
-
-        User user = new User();
-        user.setName("test-user");
-        user.setEmail("test35@email.com");
-
-        userRepository.save(user);
+        itemDto.setOwnerId(user.getId());
 
         ItemDto itemToCreate = itemService.create(user.getId(), itemDto);
 
@@ -70,17 +77,23 @@ public class ServerItemServiceImplTest {
     }
 
     @Test
+    void createItemWithWrongOwnerTest() {
+        ItemDto itemDto = new ItemDto();
+        itemDto.setName("test-item");
+        itemDto.setDescription("test-item-desc");
+        itemDto.setAvailable(true);
+        itemDto.setOwnerId(42L);
+
+        assertThrows(NotFoundException.class, () -> itemService.create(itemDto.getOwnerId(), itemDto));
+    }
+
+    @Test
     void updateItemTest() {
         ItemDto itemDto = new ItemDto();
         itemDto.setName("test-item");
         itemDto.setDescription("test-item-desc");
         itemDto.setAvailable(true);
-
-        User user = new User();
-        user.setName("test-user");
-        user.setEmail("test33@email.com");
-
-        userRepository.save(user);
+        itemDto.setOwnerId(user.getId());
 
         ItemDto itemToCreate = itemService.create(user.getId(), itemDto);
 
@@ -99,17 +112,37 @@ public class ServerItemServiceImplTest {
     }
 
     @Test
-    void getItemById() {
+    void updateItemWithWrongOwnerTest() {
         ItemDto itemDto = new ItemDto();
         itemDto.setName("test-item");
         itemDto.setDescription("test-item-desc");
         itemDto.setAvailable(true);
 
-        User user = new User();
-        user.setName("test-user");
-        user.setEmail("test34@email.com");
+        ItemDto itemToCreate = itemService.create(user.getId(), itemDto);
 
-        userRepository.save(user);
+        User notOwner = new User();
+        notOwner.setName("not-owner");
+        notOwner.setEmail("not-owner@email.com");
+
+        userRepository.save(notOwner);
+
+        UpdatedItemDto updatedItemDto = new UpdatedItemDto();
+        updatedItemDto.setId(itemToCreate.getId());
+        updatedItemDto.setName("test-item-update");
+        updatedItemDto.setDescription(itemToCreate.getDescription());
+        updatedItemDto.setAvailable(false);
+
+
+        assertThrows(BadRequest.class, () -> itemService.update(updatedItemDto.getId(), notOwner.getId(), updatedItemDto));
+    }
+
+    @Test
+    void getItemByIdTest() {
+        ItemDto itemDto = new ItemDto();
+        itemDto.setName("test-item");
+        itemDto.setDescription("test-item-desc");
+        itemDto.setAvailable(true);
+        itemDto.setOwnerId(user.getId());
 
         ItemDto itemDtoToGet = itemService.create(user.getId(), itemDto);
 
@@ -119,23 +152,68 @@ public class ServerItemServiceImplTest {
     }
 
     @Test
-    void searchTest() {
+    void getItemByWrongIdTest() {
+        ItemDto itemDto = new ItemDto();
+        itemDto.setName("test-item");
+        itemDto.setDescription("test-item-desc");
+        itemDto.setAvailable(true);
+        itemDto.setOwnerId(user.getId());
+
+        ItemDto itemDtoNotToGet = itemService.create(user.getId(), itemDto);
+
+        assertThrows(NotFoundException.class, () -> itemService.getById(42L, user.getId()));
+    }
+
+    @Test
+    void getItemsByUserIdTest() {
+        ItemDto itemDto1 = new ItemDto();
+        itemDto1.setName("test-item");
+        itemDto1.setDescription("test-item-desc");
+        itemDto1.setAvailable(true);
+        itemDto1.setOwnerId(user.getId());
+
+        ItemDto itemDto2 = new ItemDto();
+        itemDto2.setName("test-item");
+        itemDto2.setDescription("test-item-desc");
+        itemDto2.setAvailable(true);
+        itemDto2.setOwnerId(user.getId());
+
+        itemService.create(user.getId(), itemDto1);
+        itemService.create(user.getId(), itemDto2);
+
+        Collection<ItemDto> resultList = itemService.getAll(user.getId());
+
+        assertEquals(2, resultList.size());
+    }
+
+    @Test
+    void getItemsByWrongUserIdTest() {
+        ItemDto itemDto1 = new ItemDto();
+        itemDto1.setName("test-item");
+        itemDto1.setDescription("test-item-desc");
+        itemDto1.setAvailable(true);
+        itemDto1.setOwnerId(user.getId());
+
+        ItemDto itemDto2 = new ItemDto();
+        itemDto2.setName("test-item");
+        itemDto2.setDescription("test-item-desc");
+        itemDto2.setAvailable(true);
+        itemDto2.setOwnerId(user.getId());
+
+        itemService.create(user.getId(), itemDto1);
+        itemService.create(user.getId(), itemDto2);
+
+        assertThrows(NotFoundException.class, () -> itemService.getAll(42L));
+    }
+
+    @Test
+    void searchSuccessTest() {
         ItemDto itemDto = new ItemDto();
         itemDto.setName("test-item");
         itemDto.setDescription("test-item-desc");
         itemDto.setAvailable(true);
 
-        User user = new User();
-        user.setName("test-user");
-        user.setEmail("test31@email.com");
-
-        userRepository.save(user);
-
         itemService.create(user.getId(), itemDto);
-
-        Collection<ItemDto> resultsNegative = itemService.search(1L, "tset");
-
-        assertTrue(resultsNegative.isEmpty());
 
         Collection<ItemDto> resultsPositive = itemService.search(1L, "test");
 
@@ -143,17 +221,25 @@ public class ServerItemServiceImplTest {
     }
 
     @Test
-    void commentTest() {
+    void searchFailTest() {
         ItemDto itemDto = new ItemDto();
         itemDto.setName("test-item");
         itemDto.setDescription("test-item-desc");
         itemDto.setAvailable(true);
 
-        User user = new User();
-        user.setName("test-user");
-        user.setEmail("test32@email.com");
+        itemService.create(user.getId(), itemDto);
 
-        userRepository.save(user);
+        Collection<ItemDto> resultsNegative = itemService.search(1L, "tset");
+
+        assertTrue(resultsNegative.isEmpty());
+    }
+
+    @Test
+    void commentAddSuccessTest() {
+        ItemDto itemDto = new ItemDto();
+        itemDto.setName("test-item");
+        itemDto.setDescription("test-item-desc");
+        itemDto.setAvailable(true);
 
         ItemDto itemToCreate = itemService.create(user.getId(), itemDto);
 
@@ -178,6 +264,36 @@ public class ServerItemServiceImplTest {
         CommentDto commentToGet = itemService.createComment(itemToCreate.getId(), user.getId(), commentDto.getText());
 
         assertEquals("test-comment", commentToGet.getText());
+    }
+
+    @Test
+    void commentAddFailTest() {
+        ItemDto itemDto = new ItemDto();
+        itemDto.setName("test-item");
+        itemDto.setDescription("test-item-desc");
+        itemDto.setAvailable(true);
+
+        ItemDto itemToCreate = itemService.create(user.getId(), itemDto);
+
+        Item item = itemRepository.findById(itemToCreate.getId())
+                .orElseThrow(() -> new NotFoundException("вещь не найдена"));
+
+        LocalDateTime start = LocalDateTime.now().minusDays(2);
+        LocalDateTime end = LocalDateTime.now().plusDays(1);
+
+        Booking booking = new Booking();
+        booking.setStart(start);
+        booking.setEnd(end);
+        booking.setBooker(user);
+        booking.setStatus(BookingStatus.APPROVED);
+        booking.setItem(item);
+
+        bookingRepository.save(booking);
+
+        CommentDto commentDto = new CommentDto();
+        commentDto.setText("test-comment");
+
+        assertThrows(BadRequest.class, () -> itemService.createComment(itemToCreate.getId(), user.getId(), commentDto.getText()));
     }
 
 }

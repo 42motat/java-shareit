@@ -5,13 +5,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import ru.practicum.shareit.exception.Conflict;
 import ru.practicum.shareit.user.dto.UpdateUserDto;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.service.UserServiceImpl;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -42,6 +42,21 @@ public class ServerUserServiceImplTest {
     }
 
     @Test
+    void createUserWithSameEmailTest() {
+        UserDto userDto = new UserDto();
+        userDto.setName("test-user");
+        userDto.setEmail("test19@email.com");
+
+        userService.create(userDto);
+
+        UserDto anotherUserDto = new UserDto();
+        anotherUserDto.setName("test-another-user");
+        anotherUserDto.setEmail("test19@email.com");
+
+        assertThrows(Conflict.class, () -> userService.create(anotherUserDto));
+    }
+
+    @Test
     void updateUserTest() {
         UserDto userDto = new UserDto();
         userDto.setName("test-user");
@@ -57,5 +72,25 @@ public class ServerUserServiceImplTest {
         assertNotNull(userToCreate.getId());
         assertEquals("test-user", userToUpdate.getName());
         assertEquals("test42@email.com", userToUpdate.getEmail());
+    }
+
+    @Test
+    void updateUserFailTest() {
+        UserDto userDto = new UserDto();
+        userDto.setName("test-user");
+        userDto.setEmail("test44@email.com");
+
+        userService.create(userDto);
+
+        UserDto anotherUserDto = new UserDto();
+        anotherUserDto.setName("test-user");
+        anotherUserDto.setEmail("test23@email.com");
+
+        UserDto anotherUserToCreate = userService.create(anotherUserDto);
+
+        UpdateUserDto updateUserDto = new UpdateUserDto();
+        updateUserDto.setEmail("test44@email.com");
+
+        assertThrows(Conflict.class, () -> userService.update(anotherUserToCreate.getId(), updateUserDto));
     }
 }
