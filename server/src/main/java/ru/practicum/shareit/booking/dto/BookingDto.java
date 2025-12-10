@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
@@ -30,4 +31,6 @@ public class BookingDto {
     private User booker;
 
     private BookingStatus status;
+
+    private BookingState state;
 }

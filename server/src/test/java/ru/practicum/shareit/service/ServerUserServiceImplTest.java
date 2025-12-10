@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import ru.practicum.shareit.exception.Conflict;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UpdateUserDto;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -92,5 +93,66 @@ public class ServerUserServiceImplTest {
         updateUserDto.setEmail("test44@email.com");
 
         assertThrows(Conflict.class, () -> userService.update(anotherUserToCreate.getId(), updateUserDto));
+    }
+
+    @Test
+    void deleteUserByIdTest() {
+        UserDto userDto = new UserDto();
+        userDto.setName("test-user");
+        userDto.setEmail("test11@email.com");
+
+        UserDto userToCreate = userService.create(userDto);
+
+        userService.delete(userToCreate.getId());
+
+        assertThrows(NotFoundException.class, () -> userService.getById(userToCreate.getId()));
+    }
+
+    @Test
+    void getUserByIdTest() {
+        UserDto userDto = new UserDto();
+        userDto.setName("test-user");
+        userDto.setEmail("test11@email.com");
+
+        UserDto userToCreate = userService.create(userDto);
+
+        UserDto userToGet = userService.getById(userToCreate.getId());
+
+        assertEquals("test-user", userToGet.getName());
+    }
+
+    @Test
+    void getUserByWrongIdTest() {
+        UserDto userDto = new UserDto();
+        userDto.setName("test-user");
+        userDto.setEmail("test11@email.com");
+
+        UserDto userToCreate = userService.create(userDto);
+
+        userToCreate.setId(42L);
+
+        assertThrows(NotFoundException.class, () -> userService.getById(userToCreate.getId()));
+    }
+
+    @Test
+    void getAllUsersTest() {
+        UserDto userDto1 = new UserDto();
+        userDto1.setName("test-user");
+        userDto1.setEmail("test11@email.com");
+
+        UserDto userDto2 = new UserDto();
+        userDto2.setName("test-user");
+        userDto2.setEmail("test101@email.com");
+
+        userService.create(userDto1);
+
+        userService.create(userDto2);
+
+        assertEquals(2, userService.getAll().size());
+    }
+
+    @Test
+    void getNoUsersTest() {
+        assertEquals(0, userService.getAll().size());
     }
 }

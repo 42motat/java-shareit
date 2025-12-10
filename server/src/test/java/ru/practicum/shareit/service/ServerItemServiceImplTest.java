@@ -137,6 +137,21 @@ public class ServerItemServiceImplTest {
     }
 
     @Test
+    void deleteItemByIdTest() {
+        ItemDto itemDto = new ItemDto();
+        itemDto.setName("test-item");
+        itemDto.setDescription("test-item-desc");
+        itemDto.setAvailable(true);
+        itemDto.setOwnerId(user.getId());
+
+        ItemDto itemDtoToGet = itemService.create(user.getId(), itemDto);
+
+        itemService.delete(itemDtoToGet.getId());
+
+        assertThrows(NotFoundException.class, () -> itemService.getById(itemDtoToGet.getId(), user.getId()));
+    }
+
+    @Test
     void getItemByIdTest() {
         ItemDto itemDto = new ItemDto();
         itemDto.setName("test-item");
@@ -159,7 +174,7 @@ public class ServerItemServiceImplTest {
         itemDto.setAvailable(true);
         itemDto.setOwnerId(user.getId());
 
-        ItemDto itemDtoNotToGet = itemService.create(user.getId(), itemDto);
+        itemService.create(user.getId(), itemDto);
 
         assertThrows(NotFoundException.class, () -> itemService.getById(42L, user.getId()));
     }
