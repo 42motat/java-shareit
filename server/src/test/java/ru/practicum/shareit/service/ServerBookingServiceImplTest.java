@@ -102,7 +102,7 @@ public class ServerBookingServiceImplTest {
         bookingDto.setEnd(LocalDateTime.of(2026, 12, 10, 12, 0, 0));
         bookingDto.setBookerId(booker.getId());
 
-        assertThrows(NotFoundException.class, () -> bookingService.create(42L, bookingDto));
+        assertThrows(NotFoundException.class, () -> bookingService.create(4200L, bookingDto));
     }
 
     @Test
