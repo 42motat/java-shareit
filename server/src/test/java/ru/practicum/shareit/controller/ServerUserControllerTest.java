@@ -63,4 +63,37 @@ public class ServerUserControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    void getUserByIdTest() throws Exception {
+        Long userId = 1L;
+
+        UserDto requestDto = new UserDto();
+        requestDto.setName("test-user");
+        requestDto.setEmail("test2@email.com");
+
+        when(userService.create(requestDto)).thenReturn(requestDto);
+
+        mockMvc.perform(get("/users/{userId}", userId)
+                        .header(CUSTOM_USER_ID_HEADER, requestDto.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void getUsersTest() throws Exception {
+        Long userId = 1L;
+
+        UserDto requestDto = new UserDto();
+        requestDto.setName("test-user");
+        requestDto.setEmail("test2@email.com");
+
+        when(userService.create(requestDto)).thenReturn(requestDto);
+
+        mockMvc.perform(get("/users")
+                        .header(CUSTOM_USER_ID_HEADER, requestDto.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isOk());
+    }
 }

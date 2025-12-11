@@ -69,4 +69,41 @@ public class ServerItemControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    void getItemByIdTest() throws Exception {
+        Long itemId = 123L;
+
+        ItemDto requestDto = new ItemDto();
+        requestDto.setName("test-item");
+        requestDto.setDescription("test-item-desc");
+        requestDto.setAvailable(true);
+        requestDto.setOwnerId(USER_ID);
+
+        when(itemService.create(USER_ID, requestDto)).thenReturn(requestDto);
+
+        mockMvc.perform(get("/items/{itemId}", itemId)
+                        .header(CUSTOM_USER_ID_HEADER, USER_ID)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void deleteItemByIdTest() throws Exception {
+        Long itemId = 123L;
+
+        ItemDto requestDto = new ItemDto();
+        requestDto.setName("test-item");
+        requestDto.setDescription("test-item-desc");
+        requestDto.setAvailable(true);
+        requestDto.setOwnerId(USER_ID);
+
+        when(itemService.create(USER_ID, requestDto)).thenReturn(requestDto);
+
+        mockMvc.perform(delete("/items/{itemId}", itemId)
+                        .header(CUSTOM_USER_ID_HEADER, USER_ID)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isOk());
+    }
 }
