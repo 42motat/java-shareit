@@ -5,6 +5,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import ru.practicum.shareit.booking.dto.BookingItemDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
@@ -89,6 +90,33 @@ public class ServerItemServiceImplTest {
         itemDto.setOwnerId(42L);
 
         assertThrows(NotFoundException.class, () -> itemService.create(itemDto.getOwnerId(), itemDto));
+    }
+
+    @Test
+    void createItemWithBookingTest() {
+        LocalDateTime start = LocalDateTime.now().minusDays(2);
+        LocalDateTime end = LocalDateTime.now().plusDays(1);
+
+        BookingItemDto bookingItemDto = new BookingItemDto();
+        bookingItemDto.setStart(start);
+        bookingItemDto.setEnd(end);
+
+        ItemDto itemDto = new ItemDto();
+        itemDto.setName("test-item");
+        itemDto.setDescription("test-item-desc");
+        itemDto.setAvailable(true);
+        itemDto.setOwnerId(user.getId());
+
+        ItemDto itemToCreate = itemService.create(user.getId(), itemDto);
+
+        ItemBookingAndCommentDto itemWithBookingDto = new ItemBookingAndCommentDto();
+        itemWithBookingDto.setId(itemToCreate.getId());
+        itemWithBookingDto.setName("test-item");
+        itemWithBookingDto.setDescription("test-item-desc");
+        itemWithBookingDto.setAvailable(true);
+        itemWithBookingDto.setNextBooking(bookingItemDto);
+
+        assertDoesNotThrow(() -> itemService.getById(itemWithBookingDto.getId(), user.getId()));
     }
 
     @Test
@@ -276,6 +304,20 @@ public class ServerItemServiceImplTest {
     }
 
     @Test
+    void emptySearchTest() {
+        ItemDto itemDto = new ItemDto();
+        itemDto.setName("test-item");
+        itemDto.setDescription("test-item-desc");
+        itemDto.setAvailable(true);
+
+        itemService.create(user.getId(), itemDto);
+
+        Collection<ItemDto> emptyResults = itemService.search(1L, "    ");
+
+        assertTrue(emptyResults.isEmpty());
+    }
+
+    @Test
     void searchFailTest() {
         ItemDto itemDto = new ItemDto();
         itemDto.setName("test-item");
@@ -350,7 +392,6 @@ public class ServerItemServiceImplTest {
 
         assertThrows(BadRequest.class, () -> itemService.createComment(itemToCreate.getId(), user.getId(), commentDto.getText()));
     }
-
 }
 
 
