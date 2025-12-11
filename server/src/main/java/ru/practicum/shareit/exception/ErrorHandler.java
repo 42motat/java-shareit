@@ -35,7 +35,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleConflictException(final InstanceAlreadyExistsException e) {
+    public ErrorResponse handleConflictException(final Conflict e) {
         log.info("409 {}", e.getMessage(), e);
         return new ErrorResponse(e.getMessage());
     }
