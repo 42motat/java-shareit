@@ -7,10 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.item.dto.ItemForItemRequestDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repostitory.ItemRepository;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
+import ru.practicum.shareit.request.dto.ItemRequestWithItemsDto;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.request.service.ItemRequestService;
@@ -19,6 +21,7 @@ import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -45,6 +48,7 @@ public class ServerRequestServiceImplTest {
     private ItemRequestRepository itemRequestRepository;
 
     private User requestor;
+    private User owner;
     private Item item;
 
     @BeforeEach
@@ -58,6 +62,12 @@ public class ServerRequestServiceImplTest {
         requestor.setEmail("test17@email.com");
 
         userRepository.save(requestor);
+
+        owner = new User();
+        owner.setName("test-owmer");
+        owner.setEmail("test1976@email.com");
+
+        userRepository.save(owner);
     }
 
     @Test
@@ -84,6 +94,23 @@ public class ServerRequestServiceImplTest {
         requestor.setId(420000L);
 
         assertThrows(NotFoundException.class, () -> itemRequestService.create(requestor.getId(), requestDto));
+    }
+
+    @Test
+    void createItemRequestWithItemsTest() {
+        ItemForItemRequestDto item1 = new ItemForItemRequestDto();
+        item1.setName("test-item-1");
+        item1.setDescription("test-item-1-desc");
+        item1.setAvailable(true);
+        item1.setOwnerId(owner.getId());
+
+        ItemRequestWithItemsDto requestDto = new ItemRequestWithItemsDto();
+        requestDto.setDescription("test-request-with-items");
+        requestDto.setRequestorId(requestor.getId());
+        requestDto.setCreated(LocalDateTime.now());
+        requestDto.setItems(List.of(item1));
+
+        assertEquals(1, requestDto.getItems().size());
     }
 
     @Test

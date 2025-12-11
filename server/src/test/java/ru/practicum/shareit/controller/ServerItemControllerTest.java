@@ -42,9 +42,6 @@ public class ServerItemControllerTest {
 
         when(itemService.create(USER_ID, requestDto)).thenReturn(requestDto);
 
-        String json = objectMapper.writeValueAsString(requestDto);
-        log.error(json);
-
         mockMvc.perform(post("/items")
                         .header(CUSTOM_USER_ID_HEADER, USER_ID)
                         .contentType(MediaType.APPLICATION_JSON)

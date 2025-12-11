@@ -39,9 +39,9 @@ public class ServerUserControllerTest {
         when(userService.create(requestDto)).thenReturn(requestDto);
 
         mockMvc.perform(post("/users")
-                .header(CUSTOM_USER_ID_HEADER, requestDto.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(requestDto)))
+                        .header(CUSTOM_USER_ID_HEADER, requestDto.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value(requestDto.getName()));
     }
