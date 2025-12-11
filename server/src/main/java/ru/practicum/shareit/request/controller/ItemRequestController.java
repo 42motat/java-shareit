@@ -32,7 +32,7 @@ public class ItemRequestController {
     }
 
     @GetMapping("/all")
-    public Collection<ItemRequestDto> getAllRequestsOfOtherUsers(@RequestHeader(value = CUSTOM_USER_ID_HEADER)
+    public Collection<ItemRequestWithItemsDto> getAllRequestsOfOtherUsers(@RequestHeader(value = CUSTOM_USER_ID_HEADER)
                                                                  long userId) {
         return itemRequestService.getAllRequestsOfOtherUsers(userId);
     }

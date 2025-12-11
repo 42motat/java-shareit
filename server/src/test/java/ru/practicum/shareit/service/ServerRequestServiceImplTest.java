@@ -11,6 +11,7 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repostitory.ItemRepository;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
+import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.request.service.ItemRequestService;
 import ru.practicum.shareit.user.model.User;
@@ -109,24 +110,6 @@ public class ServerRequestServiceImplTest {
         assertEquals(requestToCreate.getId(), itemRequestService.getById(requestor.getId(), requestToCreate.getId()).getId());
     }
 
-//    @Test
-//    void getItemRequestsOfUserTest() {
-//        ItemRequestDto requestDto1 = new ItemRequestDto();
-//        requestDto1.setDescription("test-request");
-//        requestDto1.setRequestor(requestor);
-//        requestDto1.setCreated(LocalDateTime.now().plusDays(1));
-//
-//        ItemRequestDto requestDto2 = new ItemRequestDto();
-//        requestDto2.setDescription("test-request");
-//        requestDto2.setRequestor(requestor);
-//        requestDto2.setCreated(LocalDateTime.now().plusDays(2));
-//
-//        itemRequestService.create(requestor.getId(), requestDto1);
-//        itemRequestService.create(requestor.getId(), requestDto2);
-//
-//        assertEquals(2, itemRequestService.getAllItemRequestsOfUser(requestor.getId()).size());
-//    }
-
     @Test
     void getItemRequestsOfUnknownUserTest() {
         ItemRequestDto requestDto1 = new ItemRequestDto();
@@ -160,7 +143,7 @@ public class ServerRequestServiceImplTest {
 
         User anotherRequestor = new User();
         requestor.setName("test-another-user");
-        requestor.setEmail("test17000@email.com");
+        requestor.setEmail("test17001@email.com");
 
         userRepository.save(anotherRequestor);
 
@@ -179,5 +162,80 @@ public class ServerRequestServiceImplTest {
 
 
         assertEquals(2, itemRequestService.getAllItemRequestsOfUser(requestor.getId()).size());
+    }
+
+    @Test
+    void getItemRequestsOfOtherUserTest() {
+        ItemRequestDto requestDto1 = new ItemRequestDto();
+        requestDto1.setDescription("test-request");
+        requestDto1.setRequestor(requestor);
+        requestDto1.setCreated(LocalDateTime.now().plusDays(1));
+
+        ItemRequestDto requestDto2 = new ItemRequestDto();
+        requestDto2.setDescription("test-request");
+        requestDto2.setRequestor(requestor);
+        requestDto2.setCreated(LocalDateTime.now().plusDays(2));
+
+        itemRequestService.create(requestor.getId(), requestDto1);
+        itemRequestService.create(requestor.getId(), requestDto2);
+
+        User anotherRequestor = new User();
+        anotherRequestor.setName("test-another-user");
+        anotherRequestor.setEmail("test17100@email.com");
+
+        userRepository.save(anotherRequestor);
+
+        ItemRequestDto requestDto3 = new ItemRequestDto();
+        requestDto3.setDescription("test-request");
+        requestDto3.setRequestor(anotherRequestor);
+        requestDto3.setCreated(LocalDateTime.now().plusDays(1));
+
+        ItemRequestDto requestDto4 = new ItemRequestDto();
+        requestDto4.setDescription("test-request");
+        requestDto4.setRequestor(anotherRequestor);
+        requestDto4.setCreated(LocalDateTime.now().plusDays(2));
+
+        itemRequestService.create(anotherRequestor.getId(), requestDto3);
+        itemRequestService.create(anotherRequestor.getId(), requestDto4);
+
+
+        assertEquals(2, itemRequestService.getAllRequestsOfOtherUsers(requestor.getId()).size());
+    }
+
+    @Test
+    void createDirectlyIntoRepoTest() {
+        ItemRequest itemRequest = new ItemRequest();
+        itemRequest.setDescription("direct-insert-test");
+        itemRequest.setRequestor(requestor);
+
+        assertDoesNotThrow(() -> itemRequestRepository.save(itemRequest));
+    }
+
+    @Test
+    void getByIdDirectlyFromRepoTest() {
+        ItemRequest itemRequest = new ItemRequest();
+        itemRequest.setDescription("direct-insert-test");
+        itemRequest.setRequestor(requestor);
+
+        itemRequestRepository.save(itemRequest);
+
+        assertDoesNotThrow(() -> itemRequestRepository.findById(itemRequest.getId()));
+    }
+
+    @Test
+    void getAllItemRequestOfUserDirectlyFromRepoTest() {
+        ItemRequest itemRequest1 = new ItemRequest();
+        itemRequest1.setDescription("direct-insert-test");
+        itemRequest1.setRequestor(requestor);
+
+        itemRequestRepository.save(itemRequest1);
+
+        ItemRequest itemRequest2 = new ItemRequest();
+        itemRequest2.setDescription("direct-insert-test");
+        itemRequest2.setRequestor(requestor);
+
+        itemRequestRepository.save(itemRequest2);
+
+        assertDoesNotThrow(() -> itemRequestRepository.findAllByRequestorId(requestor.getId()));
     }
 }

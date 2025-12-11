@@ -214,6 +214,36 @@ public class ServerBookingServiceImplTest {
     }
 
     @Test
+    void getAllBookingsByBookerTest() {
+        NewBookingDto bookingDto = new NewBookingDto();
+        bookingDto.setItemId(item.getId());
+        bookingDto.setStart(LocalDateTime.of(2026, 12, 10, 11, 0, 0));
+        bookingDto.setEnd(LocalDateTime.of(2026, 12, 10, 12, 0, 0));
+        bookingDto.setBookerId(booker.getId());
+
+        BookingDto bookingToCreate = bookingService.create(booker.getId(), bookingDto);
+
+        assertEquals(1, bookingService.getAllBookingsByBooker(booker.getId(), BookingState.ALL).size());
+    }
+
+    @Test
+    void getPastBookingsByBookerTest() {
+        NewBookingDto bookingDto = new NewBookingDto();
+        bookingDto.setItemId(item.getId());
+        bookingDto.setStart(LocalDateTime.of(2026, 12, 10, 11, 0, 0));
+        bookingDto.setEnd(LocalDateTime.of(2026, 12, 10, 12, 0, 0));
+        bookingDto.setBookerId(booker.getId());
+
+        BookingDto bookingToCreate = bookingService.create(booker.getId(), bookingDto);
+
+        BookingDto updatedBookingDtoToCreate = bookingService.updateBookingStatus(owner.getId(),
+                bookingToCreate.getId(),
+                false);
+
+        assertEquals(0, bookingService.getAllBookingsByBooker(booker.getId(), BookingState.PAST).size());
+    }
+
+    @Test
     void getCurrentBookingsByOwnerTest() {
         NewBookingDto bookingDto = new NewBookingDto();
         bookingDto.setItemId(item.getId());
