@@ -1,6 +1,11 @@
 package ru.practicum.shareit.controller;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,36 +16,30 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.exception.*;
+import ru.practicum.shareit.user.controller.UserController;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.service.UserService;
 
 @Slf4j
-@WebMvcTest(ErrorHandler.class)
+@WebMvcTest(UserController.class)
 class ErrorHandlerTest {
-    @MockBean
-    private UserRepository userRepository;
+    @Autowired
+    private MockMvc mockMvc;
 
     @MockBean
     private UserService userService;
 
     @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
     private ObjectMapper objectMapper;
 
-    @MockBean
-    private ErrorHandler errorHandler;
-
     private static final String CUSTOM_USER_ID_HEADER = "X-Sharer-User-Id";
-    private UserDto userDto;
 
     @BeforeEach
     void setUp() {
-        userDto = new UserDto();
+        UserDto userDto = new UserDto();
         userDto.setName("test-user-dto");
         userDto.setEmail("test666@email.com");
 
@@ -48,38 +47,27 @@ class ErrorHandlerTest {
     }
 
     @Test
-    void handleBadRequestTest() {
-        BadRequest badRequest = new BadRequest("Bad Request Error");
+    void handleConflictTest() throws Exception {
+        UserDto requestDto = new UserDto();
+        requestDto.setName("test-user");
+        requestDto.setEmail("test666@email.com");
 
-        errorHandler.handleBadRequestException(badRequest);
+        when(userService.create(requestDto)).thenThrow(Conflict.class);
 
-        assertEquals("Bad Request Error", badRequest.getMessage());
+        mockMvc.perform(post("/users")
+                        .header(CUSTOM_USER_ID_HEADER, requestDto.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isConflict());
     }
 
     @Test
-    void handleConflictTest() {
-        Conflict conflict = new Conflict("Conflict");
+    void handleNotFoundExceptionTest() throws Exception {
+        when(userService.getById(anyLong())).thenThrow(new NotFoundException("Пользователь не найден"));
 
-        errorHandler.handleConflictException(conflict);
-
-        assertEquals("Conflict", conflict.getMessage());
-    }
-
-    @Test
-    void handleForbiddenTest() {
-        Forbidden forbidden = new Forbidden("Forbidden");
-
-        errorHandler.handleForbiddenException(forbidden);
-
-        assertEquals("Forbidden", forbidden.getMessage());
-    }
-
-    @Test
-    void handleNotFoundExceptionTest() {
-        NotFoundException notFoundException = new NotFoundException("Not Found");
-
-        errorHandler.handleNotFoundException(notFoundException);
-
-        assertEquals("Not Found", notFoundException.getMessage());
+        mockMvc.perform(get("/users/666")
+                        .header(CUSTOM_USER_ID_HEADER, 666L))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").value("Пользователь не найден"));
     }
 }
