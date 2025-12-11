@@ -47,6 +47,31 @@ class ErrorHandlerTest {
     }
 
     @Test
+    void handleBadRequestTest() throws Exception {
+        UserDto requestDto = new UserDto();
+        requestDto.setName("");
+        requestDto.setEmail("test888@email.com");
+
+        when(userService.create(requestDto)).thenThrow(BadRequest.class);
+
+        mockMvc.perform(post("/users")
+                        .header(CUSTOM_USER_ID_HEADER, requestDto.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void handleNotFoundExceptionTest() throws Exception {
+        when(userService.getById(anyLong())).thenThrow(new NotFoundException("Пользователь не найден"));
+
+        mockMvc.perform(get("/users/666")
+                        .header(CUSTOM_USER_ID_HEADER, 666L))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").value("Пользователь не найден"));
+    }
+
+    @Test
     void handleConflictTest() throws Exception {
         UserDto requestDto = new UserDto();
         requestDto.setName("test-user");
@@ -62,12 +87,17 @@ class ErrorHandlerTest {
     }
 
     @Test
-    void handleNotFoundExceptionTest() throws Exception {
-        when(userService.getById(anyLong())).thenThrow(new NotFoundException("Пользователь не найден"));
+    void handleInternalServerErrorTest() throws Exception {
+        UserDto requestDto = new UserDto();
+        requestDto.setName("test-user");
+        requestDto.setEmail("test666@email.com");
 
-        mockMvc.perform(get("/users/666")
-                        .header(CUSTOM_USER_ID_HEADER, 666L))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.error").value("Пользователь не найден"));
+        when(userService.create(requestDto)).thenThrow(new RuntimeException("Ошибка сервера"));
+
+        mockMvc.perform(post("/users")
+                        .header(CUSTOM_USER_ID_HEADER, requestDto.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isInternalServerError());
     }
 }
