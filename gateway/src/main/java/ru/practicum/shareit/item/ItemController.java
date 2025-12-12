@@ -10,6 +10,8 @@ import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.UpdatedItemDto;
 
+import java.util.ArrayList;
+
 @RestController
 @RequestMapping("/items")
 @RequiredArgsConstructor
@@ -50,7 +52,11 @@ public class ItemController {
     @GetMapping("/search")
     public ResponseEntity<Object> search(@RequestHeader(value = CUSTOM_USER_ID_HEADER) @Positive long id,
                                          @RequestParam String text) {
-        return itemClient.search(id, text);
+        if (text.isBlank()) {
+            return ResponseEntity.ok(new ArrayList<>());
+        } else {
+            return itemClient.search(id, text);
+        }
     }
 
     @PostMapping("/{id}/comment")

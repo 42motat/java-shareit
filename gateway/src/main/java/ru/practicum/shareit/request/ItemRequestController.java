@@ -1,5 +1,6 @@
 package ru.practicum.shareit.request;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -37,7 +38,7 @@ public class ItemRequestController {
 
     @PostMapping
     public ResponseEntity<Object> create(@RequestHeader(value = CUSTOM_USER_ID_HEADER) @Positive long userId,
-                                         @RequestBody ItemRequestDto itemRequestDto) {
+                                         @RequestBody @Valid ItemRequestDto itemRequestDto) {
         return requestClient.create(userId, itemRequestDto);
     }
 }

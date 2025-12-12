@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -47,18 +46,18 @@ class ErrorHandlerTest {
     }
 
     @Test
-    void handleBadRequestTest() throws Exception {
+    void handleGeneralErrorTest() throws Exception {
         UserDto requestDto = new UserDto();
         requestDto.setName("");
         requestDto.setEmail("test888@email.com");
 
-        when(userService.create(requestDto)).thenThrow(BadRequest.class);
+        when(userService.create(requestDto)).thenThrow(InternalError.class);
 
         mockMvc.perform(post("/users")
                         .header(CUSTOM_USER_ID_HEADER, requestDto.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDto)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isInternalServerError());
     }
 
     @Test
